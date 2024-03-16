@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/user" // for current user
 	"strings"
 )
 
@@ -24,8 +25,17 @@ type Connection struct {
 }
 
 func main() {
+
+	currentUser, err := user.Current()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Printf("currentUser: %v\n", currentUser.HomeDir)
+
 	// Open the file
-	file, err := os.Open("C:\\Users\\Musabii\\AppData\\Roaming\\1C\\1CEStart\\ibases.v8i")
+	file, err := os.Open(currentUser.HomeDir + "\\AppData\\Roaming\\1C\\1CEStart\\ibases.v8i")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return
