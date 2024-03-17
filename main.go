@@ -26,32 +26,56 @@ type Connection struct {
 
 func main() {
 
+	foldersMap := getFoldersMap()
+
+	// Convert the unique folders map keys to a list
+
+	for k, v := range foldersMap {
+		fmt.Println(k)
+		for _, vv := range v {
+			fmt.Println(vv.Connect)
+		}
+
+	}
+
+	// fmt.Printf("connections: %v\n", connections)
+
+	// // Convert connections slice to JSON
+	// jsonData, err := json.MarshalIndent(connections, "", "  ")
+	// if err != nil {
+	// 	fmt.Println("Error marshalling to JSON:", err)
+	// 	return
+	// }
+
+	// Print JSON data
+	// fmt.Println(string(jsonData))
+	// fmt.Printf("uniqueFoldersList: %v\n", uniqueFoldersList)
+}
+
+func getFoldersMap() map[string][]Connection {
+	foldersMap := make(map[string][]Connection)
+
 	currentUser, err := user.Current()
 	if err != nil {
 		fmt.Println("Error:", err)
-		return
+		return foldersMap
 	}
-
-	fmt.Printf("currentUser: %v\n", currentUser.HomeDir)
 
 	// Open the file
 	file, err := os.Open(currentUser.HomeDir + "\\AppData\\Roaming\\1C\\1CEStart\\ibases.v8i")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
-		return
+		return foldersMap
 	}
 	defer file.Close()
 
+	var currentConnection Connection
 	var connections []Connection
 
 	// Create a scanner to read the file line by line
 	scanner := bufio.NewScanner(file)
 
 	// Create a map to store unique folders
-	uniqueFolders := make(map[string]bool)
-	foldersMap := make(map[string][]Connection)
-
-	var currentConnection Connection
 
 	// Iterate over each line
 	for scanner.Scan() {
@@ -84,7 +108,6 @@ func main() {
 			fmt.Sscanf(value, "%d", &currentConnection.OrderInList)
 		case "Folder":
 			currentConnection.Folder = value
-			uniqueFolders[value] = true
 		case "OrderInTree":
 			fmt.Sscanf(value, "%d", &currentConnection.OrderInTree)
 		case "External":
@@ -109,33 +132,8 @@ func main() {
 	if currentConnection.ID != "" {
 		connections = append(connections, currentConnection)
 		foldersMap[currentConnection.Folder] = append(foldersMap[currentConnection.Folder], currentConnection)
-
 	}
 
-	// Convert the unique folders map keys to a list
-	var uniqueFoldersList []string
-	for folder := range uniqueFolders {
-		uniqueFoldersList = append(uniqueFoldersList, folder)
-	}
+	return foldersMap
 
-	for k, v := range foldersMap {
-		fmt.Println(k)
-		for _, vv := range v {
-			fmt.Println(vv.Connect)
-		}
-
-	}
-
-	// fmt.Printf("connections: %v\n", connections)
-
-	// // Convert connections slice to JSON
-	// jsonData, err := json.MarshalIndent(connections, "", "  ")
-	// if err != nil {
-	// 	fmt.Println("Error marshalling to JSON:", err)
-	// 	return
-	// }
-
-	// Print JSON data
-	// fmt.Println(string(jsonData))
-	// fmt.Printf("uniqueFoldersList: %v\n", uniqueFoldersList)
 }
