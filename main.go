@@ -10,6 +10,7 @@ import (
 
 type Connection struct {
 	Connect                  string `json:"connect"`
+	Name                     string `json:"name"`
 	ID                       string `json:"id"`
 	OrderInList              int    `json:"order_in_list"`
 	Folder                   string `json:"folder"`
@@ -26,14 +27,15 @@ type Connection struct {
 
 func main() {
 
-	foldersMap := getFoldersMap()
+	connections := getConnections() // Get the connections
+	foldersMap := getFoldersMap(connections)
 
 	// Convert the unique folders map keys to a list
 
 	for k, v := range foldersMap {
-		fmt.Println(k)
+		fmt.Println("folder", k)
 		for _, vv := range v {
-			fmt.Println(vv.Connect)
+			fmt.Println("\t" + vv.Name)
 		}
 
 	}
@@ -52,25 +54,37 @@ func main() {
 	// fmt.Printf("uniqueFoldersList: %v\n", uniqueFoldersList)
 }
 
-func getFoldersMap() map[string][]Connection {
+func getFoldersMap(connections []Connection) map[string][]Connection {
+
+	foldersMap := map[string][]Connection{}
+
+	for _, connection := range connections {
+		if connection.Folder != "" {
+			foldersMap[connection.Folder] = append(foldersMap[connection.Folder], connection)
+		}
+	}
+	return foldersMap
+}
+
+func getConnections() []Connection {
 	foldersMap := make(map[string][]Connection)
+
+	var currentConnection Connection
+	var connections []Connection
 
 	currentUser, err := user.Current()
 	if err != nil {
 		fmt.Println("Error:", err)
-		return foldersMap
+		return connections
 	}
 
 	// Open the file
 	file, err := os.Open(currentUser.HomeDir + "\\AppData\\Roaming\\1C\\1CEStart\\ibases.v8i")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
-		return foldersMap
+		return connections
 	}
 	defer file.Close()
-
-	var currentConnection Connection
-	var connections []Connection
 
 	// Create a scanner to read the file line by line
 	scanner := bufio.NewScanner(file)
@@ -88,7 +102,8 @@ func getFoldersMap() map[string][]Connection {
 				foldersMap[currentConnection.Folder] = append(foldersMap[currentConnection.Folder], currentConnection)
 			}
 			currentConnection = Connection{}
-			continue
+			line = "Name=" + line[1:len(line)-1]
+			// continue
 		}
 
 		// Parse key-value pairs
@@ -104,6 +119,8 @@ func getFoldersMap() map[string][]Connection {
 			currentConnection.Connect = value
 		case "ID":
 			currentConnection.ID = value
+		case "Name":
+			currentConnection.Name = value
 		case "OrderInList":
 			fmt.Sscanf(value, "%d", &currentConnection.OrderInList)
 		case "Folder":
@@ -134,6 +151,6 @@ func getFoldersMap() map[string][]Connection {
 		foldersMap[currentConnection.Folder] = append(foldersMap[currentConnection.Folder], currentConnection)
 	}
 
-	return foldersMap
+	return connections
 
 }
