@@ -154,3 +154,7 @@ func getConnections() []Connection {
 	return connections
 
 }
+
+func SayHi() {
+	fmt.Println("Hello, World!")
+}
