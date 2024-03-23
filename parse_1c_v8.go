@@ -1,4 +1,4 @@
-package main
+package parse_1c_v8
 
 import (
 	"bufio"
