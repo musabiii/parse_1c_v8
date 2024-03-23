@@ -27,8 +27,8 @@ type Connection struct {
 
 func main() {
 
-	connections := getConnections() // Get the connections
-	foldersMap := getFoldersMap(connections)
+	connections := GetConnections() // Get the connections
+	foldersMap := GetFoldersMap(connections)
 
 	// Convert the unique folders map keys to a list
 
@@ -54,7 +54,7 @@ func main() {
 	// fmt.Printf("uniqueFoldersList: %v\n", uniqueFoldersList)
 }
 
-func getFoldersMap(connections []Connection) map[string][]Connection {
+func GetFoldersMap(connections []Connection) map[string][]Connection {
 
 	foldersMap := map[string][]Connection{}
 
@@ -66,7 +66,7 @@ func getFoldersMap(connections []Connection) map[string][]Connection {
 	return foldersMap
 }
 
-func getConnections() []Connection {
+func GetConnections() []Connection {
 	foldersMap := make(map[string][]Connection)
 
 	var currentConnection Connection
@@ -157,4 +157,8 @@ func getConnections() []Connection {
 
 func SayHi() {
 	fmt.Println("Hello, World!")
+}
+
+func sayBuy() {
+	fmt.Println("Buy, buy, buy!")
 }
