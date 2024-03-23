@@ -2,6 +2,7 @@ package parse_1c_v8
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/user" // for current user
@@ -25,7 +26,7 @@ type Connection struct {
 	DefaultApp               string `json:"default_app,omitempty"`
 }
 
-func main() {
+func parse_1c_v8() {
 
 	connections := GetConnections() // Get the connections
 	foldersMap := GetFoldersMap(connections)
@@ -40,18 +41,18 @@ func main() {
 
 	}
 
-	// fmt.Printf("connections: %v\n", connections)
+	fmt.Printf("connections: %v\n", connections)
 
-	// // Convert connections slice to JSON
-	// jsonData, err := json.MarshalIndent(connections, "", "  ")
-	// if err != nil {
-	// 	fmt.Println("Error marshalling to JSON:", err)
-	// 	return
-	// }
+	// Convert connections slice to JSON
+	jsonData, err := json.MarshalIndent(connections, "", "  ")
+	if err != nil {
+		fmt.Println("Error marshalling to JSON:", err)
+		return
+	}
 
 	// Print JSON data
-	// fmt.Println(string(jsonData))
-	// fmt.Printf("uniqueFoldersList: %v\n", uniqueFoldersList)
+	fmt.Println(string(jsonData))
+
 }
 
 func GetFoldersMap(connections []Connection) map[string][]Connection {
@@ -79,7 +80,9 @@ func GetConnections() []Connection {
 	}
 
 	// Open the file
-	file, err := os.Open(currentUser.HomeDir + "\\AppData\\Roaming\\1C\\1CEStart\\ibases.v8i")
+	baseListPath := fmt.Sprintf("%s\\AppData\\Roaming\\1C\\1CEStart\\ibases.v8i", currentUser.HomeDir)
+	// file, err := os.Open(currentUser.HomeDir + "\\AppData\\Roaming\\1C\\1CEStart\\ibases.v8i")
+	file, err := os.Open(baseListPath)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return connections
